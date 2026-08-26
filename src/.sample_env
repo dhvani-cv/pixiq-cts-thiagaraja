@@ -1,0 +1,6 @@
+# Azure Blob Storage credentials for cloud upload
+# These values are read by BlobUploader at runtime.
+# Generate a SAS token in Azure Portal with Blob write + create permissions.
+
+AZURE_STORAGE_CONNECTION_STRING=""
+AZURE_STORAGE_CONTAINER=""

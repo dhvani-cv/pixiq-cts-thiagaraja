@@ -1,0 +1,64 @@
+%%{ init: { 'theme': 'base', 'themeVariables': { 'primaryColor': '#1a1a2e', 'primaryTextColor': '#fff', 'lineColor': '#e94560', 'secondaryColor': '#16213e' } } }%%
+graph TB
+    subgraph FACTORY["Factory Floor Network — 192.168.1.0/24"]
+        direction TB
+
+        SW["🔌 Industrial Managed Switch\nMTU 9000 (jumbo frames)\nAll ports on 192.168.1.x"]
+
+        subgraph CAMS["GigE Vision Cameras"]
+<<<<<<< HEAD
+            VL["📷 VL Camera\na2A2600-20gcPRO (25mm, 6mp)\n2600×2048\n192.168.1.160"]
+            UV["📷 UV Camera\nacA1920-40gc (16mm, 5mp)\n1920×1200\n192.168.1.161"]
+            TAIL["📷 Tail Camera\na2A1920-40gc (25mm, 5mp)\n1920×1200\n192.168.1.162"]
+=======
+            VL["📷 VL Camera\na2A2600-20gcPRO\n2600×2048\n192.168.1.160"]
+            UV["📷 UV Camera\nacA1920-40gc\n1920×1200\n192.168.1.161"]
+            TAIL["📷 Tail Camera\na2A1920-40gc\n1920×1200\n192.168.1.162"]
+>>>>>>> origin/main
+        end
+
+        PLC["⚙️ Siemens S7 PLC\nModbus TCP :502\n192.168.1.110"]
+        HMI["🖥️ HMI Touchscreen\nAll-in-one Desktop\nChromium → :80\n192.168.1.x"]
+
+        VL -- "GigE Vision UDP\njumbo packets\nhw trigger Line1" --> SW
+        UV -- "GigE Vision UDP\njumbo packets\nhw trigger Line1" --> SW
+        TAIL -- "GigE Vision UDP\njumbo packets\nhw trigger Line1" --> SW
+        PLC -- "Modbus TCP\nregister R/W" --> SW
+        HMI -- "HTTP / WebSocket\nports 80, 5004" --> SW
+    end
+
+    subgraph PIXIQ["pixIQ — Jetson Orin NX 16GB"]
+        direction TB
+
+        NIC1["🔵 NIC 1 — Factory LAN\n192.168.1.x (static)\nMTU 9000, jumbo frames\nGRO/GSO/TSO off"]
+        NIC2["🟢 NIC 2 — Internet\nDHCP / office LAN\nMTU 1500 (default)"]
+
+        subgraph SVC["Services"]
+            NGX["nginx :80\nreverse proxy"]
+            INS["Inspection Service\nSocket.IO :5004"]
+            API["REST API\nFastAPI :5002"]
+            RPT["Report UI\nNode.js :5001"]
+        end
+
+        subgraph ML["Inference (GPU)"]
+            YOLO["YOLO ×3\nTensorRT FP16\n~15ms each"]
+            PATCH["PatchCore\nPyTorch FP16\nstain detection"]
+            TUBE["Tube Pattern\nCPU numpy\ncolor + FFT"]
+        end
+
+        NGX --> INS
+        NGX --> API
+        NGX --> RPT
+        INS --> YOLO
+        INS --> PATCH
+        INS --> TUBE
+    end
+
+    SW -- "camera frames\nPLC commands\nHMI traffic" --> NIC1
+    NIC2 -- "Azure blob uploads\nSSH remote access\napt updates" --> INET["☁️ Internet\nOffice LAN"]
+
+    style FACTORY fill:#1a1a2e,stroke:#e94560,color:#fff
+    style PIXIQ fill:#16213e,stroke:#0f3460,color:#fff
+    style CAMS fill:#0f3460,stroke:#533483,color:#fff
+    style SVC fill:#1a1a2e,stroke:#533483,color:#fff
+    style ML fill:#1a1a2e,stroke:#e94560,color:#fff

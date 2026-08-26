@@ -1,0 +1,146 @@
+{
+    "data_root": "/home/t/cone-transport-system-pixiq",
+    "shift_hours": 8.0,
+    "auth": {
+        "session_hours": 8.0,
+        "admin_username": "admin",
+        "admin_password": "admin"
+    },
+    "logging": {
+        "level": "INFO",
+        "console_level": "INFO",
+        "directory": "logs",
+        "json_logs": true,
+        "max_bytes": 10485760,
+        "backup_count": 10
+    },
+    "plc": {
+        "host": "192.168.1.110",
+        "port": 502,
+        "unit_id": 1,
+        "timeout": 3.0,
+        "poll_interval": 0.1,
+        "registers": {
+            "input": {
+                "sample_counter": 0,
+                "trigger": 1,
+                "c2c_start": 7,
+                "material_no": 8,
+                "basket_no": 11,
+                "loader_id": 12
+            },
+            "output": {
+                "result": 2,
+                "camera_error": 14,
+                "ips_status": 15,
+                "basket_no_echo": 16,
+                "material_no_echo": 17,
+                "loader_no_echo": 18,
+                "cycle_start": 9,
+                "defect_type": 19,
+                "ack": 20
+            },
+            "light": {
+                "uv": 4,
+                "vl": 5,
+                "yarntail": 6
+            }
+        }
+    },
+    "cameras": {
+        "VL": {
+            "ip": "192.168.1.160",
+            "exposure": 11000,
+            "timeout": 2000,
+            "trigger_debounce_us": 200000
+        },
+        "UV": {
+            "ip": "192.168.1.161",
+            "exposure": 70000,
+            "timeout": 2000,
+            "trigger_debounce_us": 200000
+        },
+        "Tail": {
+            "ip": "192.168.1.162",
+            "exposure": 8000,
+            "timeout": 2000,
+            "trigger_debounce_us": 200000
+        }
+    },
+    "inspection": {
+        "weights": {
+            "visible": "weights/visible_yolo.pt",
+            "uv": "weights/uv_yolo.pt"
+        },
+        "patchcore_model": "models/patchcore",
+        "database": "data/db/materials.db",
+        "recipe_dir": "data/recipes",
+        "pixels_per_mm": 4.3,
+        "yolo_conf": 0.6,
+        "stain_threshold": 0.5,
+        "tasks": {
+            "dimension_check": true,
+            "stain_detection": true,
+            "tube_pattern": true,
+            "uv_inspection": true,
+            "tail_inspection": true
+        },
+        "teach": {
+            "stain_detection": false,
+            "uv_inspection": false,
+            "tail_inspection": false,
+            "dimension_check": false
+        },
+        "uv_inspection": {
+            "yolo_weights": "weights/uv_yolo.pt",
+            "yolo_conf": 0.3,
+            "radial_dip_threshold": 0.024,
+            "outer_margin": 0.1
+        },
+        "tail_inspection": {
+            "yolo_weights": "weights/yarn_tail_v3.pt",
+            "yolo_conf": 0.5
+        },
+        "tube_pattern": {
+            "template_dir": "data/templates/tube",
+            "bilateral_d": 9,
+            "bilateral_sigma_color": 75,
+            "bilateral_sigma_space": 75,
+            "inner_crop_pct": 0.1,
+            "outer_crop_pct": 0.1,
+            "inner_ratio": 0.8,
+            "max_entropy_delta": 0,
+            "max_bhatt_distance": 0.6,
+            "fft_weight": 0.3,
+            "verification_mode": false
+        }
+    },
+    "teaching": {
+        "template_dir": "data/templates/tube",
+        "device": "auto"
+    },
+    "api": {
+        "host": "0.0.0.0",
+        "port": 5002,
+        "cors_origins": [
+            "*"
+        ]
+    },
+    "service": {
+        "host": "0.0.0.0",
+        "port": 5004,
+        "cors_origins": "*",
+        "preload_models": true,
+        "auto_start_inspection": false,
+        "auto_start_trial": false,
+        "stream": {
+            "report_width": 1280,
+            "report_height": 720,
+            "report_quality": 80,
+            "live_width": 640,
+            "live_height": 480,
+            "live_quality": 70,
+            "live_fps": 10
+        }
+    }
+}

@@ -1,0 +1,56 @@
+graph TD
+  subgraph Production_Line["Production Line - Yarn Cone Transfer System"]
+    ENC["Position Encoder<br/>Conveyor Tracking"]
+    PROX["Proximity Sensor<br/>Cone Detection"]
+    CONE["Yarn Cones<br/>Multiple Types/Recipes"]:::product
+  end
+
+  CONE --> PROX
+
+  PROX --> PLC["Transfer System PLC<br/>Conveyor Control"]
+  ENC --> PLC
+
+  PLC == "Recipe Data<br/>Cone Type ID<br/>Yarn Specs<br/>Quality Params" ==> PIX
+
+  PLC -- "HW Trigger A<br/>(Encoder Position)" --> CAM_VL["VL Camera<br/>Basler a2A2600-20gcPRO<br/>2600×2048, 25mm"]
+  PLC -- "HW Trigger B<br/>(Encoder Position)" --> CAM_UV["UV Camera<br/>Basler acA1920-40gc<br/>1920×1200, 16mm"]
+  PLC -- "HW Trigger C<br/>(Encoder Position)" --> CAM_TAIL["Tail Camera<br/>Basler a2A1920-40gc<br/>1920×1200, 25mm"]
+
+  L_VIS["White LED Strobe"]:::light
+  L_UV["UV LED Strobe"]:::light
+  L_TAIL["White LED Strobe"]:::light
+  CAM_VL -- "Strobe Out" --> L_VIS
+  CAM_UV -- "Strobe Out" --> L_UV
+  CAM_TAIL -- "Strobe Out" --> L_TAIL
+
+  subgraph Network["Network Infrastructure"]
+    SW["Managed GigE Switch<br/>Industrial Grade<br/>MTU 9000"]
+  end
+
+  CAM_VL -.GigE.- SW
+  CAM_UV -.GigE.- SW
+  CAM_TAIL -.GigE.- SW
+
+  subgraph PixIQ_System["PixIQ Vision Inspection System"]
+    PIX["PixIQ AI Edge Server<br/>Jetson Orin NX 16GB"]:::edge
+    RECIPE_DB[("Recipe Database<br/>Multi-Cone Type<br/>Quality Standards")]:::database
+    HMI["Integrated HMI<br/>21.5 inch Display<br/>Recipe Management"]:::interface
+  end
+
+  SW -.GigE.- PIX
+  PIX --- RECIPE_DB
+  PIX --- HMI
+
+  PIX == "Recipe Selection<br/>AI Inspection<br/>200ms per Cone" ==> PIX
+
+  PIX == "PASS/FAIL + Defect Codes<br/>Cone Type ID<br/>Quality Data" ==> PLC
+
+  PLC --> TRANSFER["Transfer Control<br/>Diverters/Pushers<br/>Type-based Routing"]
+
+  PIX --> DB[("Production Data<br/>QC Logs + Images<br/>Recipe Traceability")]:::database
+
+  classDef edge fill:#eef7ff,stroke:#2b6cb0,stroke-width:3px,color:#1a365d;
+  classDef light fill:#fff8e1,stroke:#f57c00,stroke-width:2px,color:#e65100;
+  classDef database fill:#e8f5e9,stroke:#388e3c,stroke-width:2px,color:#1b5e20;
+  classDef interface fill:#fce4ec,stroke:#c2185b,stroke-width:2px,color:#880e4f;
+  classDef product fill:#fff3e0,stroke:#f57c00,stroke-width:2px,color:#e65100;

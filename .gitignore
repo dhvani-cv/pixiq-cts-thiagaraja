@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# Live/runtime config — keep deploy/config.template.json instead
+src/config.json
+src/config.json.backup.*
+src/config.json.preclf.*
+src/config.json.prethr.*
+src/config.json.pre_*
+
+# Secrets
+.env
+*.env
+!src/.sample_env
+
+# Model weights — tracked via DVC, only keep the .dvc pointer files
+weights/*.pt
+weights/*.onnx
+weights/*.engine
+!weights/*.dvc
+
+# Trained model artifacts
+models/
+
+# Logs
+*.log
+cleanup/cleanup.log
+
+# OS / editor cruft
+.DS_Store
+.vscode/
+*.swp

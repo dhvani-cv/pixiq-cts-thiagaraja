@@ -1,0 +1,10 @@
+# Allow the Sieger service user to trigger a full service restart from the
+# API (POST /system/restart) without a password — scoped to exactly the
+# detached transient unit that runs the root-owned restart script.
+#
+# Install (as root):
+#   install -m 0440 deploy/sudoers/sieger-restart /etc/sudoers.d/sieger-restart
+#   visudo -c   # verify syntax before logging out!
+#
+# Replace 'pixiq' with the DEPLOY_USER from the systemd units if different.
+pixiq ALL=(root) NOPASSWD: /usr/bin/systemd-run --unit=sieger-restart --collect /usr/local/bin/sieger-restart.sh

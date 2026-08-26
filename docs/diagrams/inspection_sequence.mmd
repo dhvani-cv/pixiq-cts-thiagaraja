@@ -1,0 +1,46 @@
+sequenceDiagram
+  autonumber
+  participant PLC as Siemens S7 PLC<br/>Modbus TCP
+  participant PIX as PixIQ Controller<br/>Jetson Orin NX
+  participant VL as VL Camera<br/>a2A2600-20gcPRO (25mm)
+  participant TAIL as Tail Camera<br/>a2A1920-40gc (25mm)
+  participant UV as UV Camera<br/>acA1920-40gc (16mm)
+  participant HMI as HMI Touchscreen
+
+  Note over PLC: Cone detected by proximity sensor
+
+  PLC->>PIX: Trigger register raised (40002)
+  PIX->>PLC: Read registers (material_no, basket_no, loader_id, sample_counter)
+
+  Note over PIX: Sequential capture — light switching between each
+
+  PIX->>VL: Hardware trigger (Line1)
+  VL->>VL: Capture + visible light (11 ms)
+  VL-->>PIX: VL frame
+
+  Note over PIX: Switch light relay: visible → tail
+  PIX->>TAIL: Hardware trigger (Line1)
+  TAIL->>TAIL: Capture + tail light (8 ms)
+  TAIL-->>PIX: Tail frame
+
+  Note over PIX: Switch light relay: tail → UV
+  PIX->>UV: Hardware trigger (Line1)
+  UV->>UV: Capture + UV light (70 ms)
+  UV-->>PIX: UV frame
+
+  Note over PIX: YOLO inference on VL frame<br/>Detect yarn_cone + yarn_tube bboxes
+
+  par 5 Inspection Modules (parallel)
+    PIX->>PIX: Tube pattern check (VL + tube bbox)
+    PIX->>PIX: Stain check (VL + cone bbox)
+    PIX->>PIX: Dimension check (VL + both bboxes)
+    PIX->>PIX: UV thread mixup (UV + cone bbox)
+    PIX->>PIX: Tail check (Tail frame)
+  end
+
+  Note over PIX: Aggregate: 1=Good, 2=Defect, 0=Teaching, 3=Error
+
+  PIX->>PLC: Write result + defect_type (40003, 40020)
+  PIX->>PLC: Write ack (40021)
+  PIX-->>HMI: Socket.IO frame event + results
+  PIX->>PIX: Save audit JPEG + SQLite row

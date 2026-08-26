@@ -1,0 +1,37 @@
+[project]
+name = "sieger-pixiq-cv"
+version = "1.0.0"
+description = "pixIQ yarn cone inspection system — Jetson Orin NX + Basler GigE cameras"
+readme = "README.md"
+requires-python = ">=3.10, <3.11"
+
+dependencies = [
+    "anomalib>=2.2.0",
+    "azure-storage-blob>=12.28.0",
+    "dnspython>=2.8.0",
+    "eventlet>=0.40.4",
+    "fastapi>=0.115.0",
+    "ifcfg>=0.24",
+    "numpy<2.0.0",
+    "opencv-python<4.11.0",
+    "onnx>=1.16.0,<1.17.0",
+    "onnxslim>=0.1.31",
+    "torch==2.11.0",
+    "torchvision==0.26.0",
+    "pymodbustcp>=0.3.0",
+    "pypylon>=4.0.0",
+    "python-multipart>=0.0.20",
+    "python-socketio>=5.16.0",
+    "pytz>=2025.2",
+    "scikit-image>=0.24.0",
+    "ultralytics>=8.3.0,<8.4.0",
+    "uvicorn>=0.34.0",
+    "bcrypt>=4.2.0",
+]
+
+[tool.uv]
+environments = ["sys_platform == 'linux' and platform_machine == 'aarch64'"]
+
+[tool.uv.sources]
+torch = { path = "torch-2.11.0-cp310-cp310-linux_aarch64.whl" }
+torchvision = { path = "torchvision-0.26.0-cp310-cp310-linux_aarch64.whl" }
